@@ -1,8 +1,22 @@
-FROM python:3.9.7-slim-buster
+FROM python:3.9-slim-buster
 
-WORKDIR .
+WORKDIR /app
+
+# System dependencies (Debian → apt-get)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libffi-dev \
+    ffmpeg \
+    mediainfo \
+    aria2 \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --upgrade pip
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
 COPY . .
 
-RUN apk add --no-cache gcc libffi-dev musl-dev ffmpeg aria2 \
-    && pip install --no-cache-dir -r requirements.txt
-CMD [ "python", "./main.py" ]
+CMD ["python", "main.py"]
